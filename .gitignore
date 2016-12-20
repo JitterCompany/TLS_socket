@@ -1,0 +1,10 @@
+build
+*.DS_Store
+*.swp
+*.swo
+*.orig
+tags
+libs
+src/generated
+tests/server_settings.h
+tests/TLS_CA.h
