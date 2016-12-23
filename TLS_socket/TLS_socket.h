@@ -136,6 +136,19 @@ bool TLS_socket_connect(TLSSocket *ctx, const char *host, const char *port);
  */
 bool TLS_socket_is_ready(TLSSocket *ctx);
 
+/**
+ * Check if the socket is closed.
+ *
+ * Use this function to know if the socket is closed, which means
+ * a new connection can be created. If the socket is not closed, it may be
+ * busy connecting, disconnecting, or actively sending/receiving data.
+ *
+ * @param ctx       TLSSocket, initialized with TLS_socket_init()
+ *
+ * @return          True if the socket is fully closed, False if the socket
+ *                  is (still) in use.
+ */
+bool TLS_socket_is_closed(TLSSocket *ctx);
 
 /**
  * Try to send data over the tls socket.

@@ -385,3 +385,8 @@ int TLS_socket_get_last_error(TLSSocket *ctx)
     return ctx->last_error;
 }
 
+bool TLS_socket_is_closed(TLSSocket *ctx)
+{
+    return (ctx->state == TLS_SOCKET_STATE_CLOSED);
+}
+
