@@ -119,7 +119,9 @@ void test_TLS_socket(void)
 
     // connect
     TEST_ASSERT_TRUE(TLS_socket_connect(&socket, SERVER_ADDR, SERVER_PORT));
-    while(!TLS_socket_is_ready(&socket));
+    while(!TLS_socket_is_ready(&socket)) {
+        TEST_ASSERT_EQUAL(0, TLS_socket_get_last_error(&socket));
+    }
     TEST_ASSERT_EQUAL(0, TLS_socket_get_last_error(&socket));
     TEST_ASSERT_EQUAL(TLS_SOCKET_STATE_OPEN, socket.state);
 
