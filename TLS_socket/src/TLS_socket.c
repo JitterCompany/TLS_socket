@@ -118,8 +118,6 @@ void TLS_socket_deinit(TLSSocket *ctx)
     mbedtls_memory_buffer_alloc_free();
 }
 
-// TODO add check to all functions to ensure socket is configured succesfully.
-// e.g. check if state > NONE
 bool TLS_socket_configure(TLSSocket *ctx,
         const char *server_hostname,
         const uint8_t *ca_cert,     size_t sizeof_ca_cert,
@@ -272,7 +270,9 @@ bool TLS_socket_is_ready(TLSSocket *ctx)
         ctx->state = TLS_SOCKET_STATE_HANDSHAKING;
     }
     if(ctx->state == TLS_SOCKET_STATE_HANDSHAKING) {
-        handle_handshake(ctx);
+        if(!handle_handshake(ctx)) {
+            return false;
+        }
     }
     return (ctx->state == TLS_SOCKET_STATE_OPEN);
 }
@@ -280,7 +280,10 @@ bool TLS_socket_is_ready(TLSSocket *ctx)
 enum TLSSocketResult TLS_socket_send(TLSSocket *ctx,
         const void *buffer, size_t sizeof_buffer, size_t *bytes_sent)
 {
+    *bytes_sent = 0;
+
     if(ctx->state != TLS_SOCKET_STATE_OPEN) {
+        set_error(ctx, -1);
         return TLS_SOCKET_RESULT_ERROR;
     }
 
@@ -294,6 +297,7 @@ enum TLSSocketResult TLS_socket_send(TLSSocket *ctx,
         }
 
         if((size_t)result > len) {
+            set_error(ctx, -1);
             return TLS_SOCKET_RESULT_ERROR;
         }
         src+= result;
@@ -318,7 +322,10 @@ enum TLSSocketResult TLS_socket_send(TLSSocket *ctx,
 enum TLSSocketResult TLS_socket_receive(TLSSocket *ctx,
         void *buffer, size_t sizeof_buffer, size_t *bytes_received)
 {
+    *bytes_received = 0;
+
     if(ctx->state != TLS_SOCKET_STATE_OPEN) {
+        set_error(ctx, -1);
         return TLS_SOCKET_RESULT_ERROR;
     }
 
@@ -334,6 +341,7 @@ enum TLSSocketResult TLS_socket_receive(TLSSocket *ctx,
         }
 
         if((size_t)result > len) {
+            set_error(ctx, -1);
             return TLS_SOCKET_RESULT_ERROR;
         }
         dst+= result;

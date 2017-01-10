@@ -198,7 +198,7 @@ enum TLSSocketResult TLS_socket_send(TLSSocket *ctx,
  * @return                  Result of trying to send the given data:
  *                          - TLS_SOCKET_RESULT_OK: some data was succesfully
  *                              received. See 'bytes_received' to determine how 
- *                              much was actually sent.
+ *                              much was actually received.
  *
  *                          - TLS_SOCKET_RESULT_TRY_LATER: no data was
  *                              received. In this case the network buffer is

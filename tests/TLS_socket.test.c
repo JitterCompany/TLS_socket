@@ -33,8 +33,9 @@ static bool do_test_api_call(TLSSocket *socket,
 
     size_t written = 0;
     while(request_len) {
-       
-        size_t bytes_sent = 0; 
+
+        TEST_ASSERT_FALSE(TLS_socket_is_closed(socket));
+        size_t bytes_sent = 0;
         enum TLSSocketResult result = TLS_socket_send(socket,
                 (const uint8_t*)request_data + written,
                 request_len,
