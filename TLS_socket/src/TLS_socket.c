@@ -142,11 +142,15 @@ bool TLS_socket_configure(TLSSocket *ctx,
     }
 
     // configure entropy sources: getter function //
-    int func_strength = (ctx->entropy_strength & PLATFORM_ENTROPY_FUNC_STRONG)
-        ? MBEDTLS_ENTROPY_SOURCE_STRONG : MBEDTLS_ENTROPY_SOURCE_WEAK;
+    int func_strength = MBEDTLS_ENTROPY_SOURCE_WEAK;
+    size_t threshold = 0;
+    if(ctx->entropy_strength & PLATFORM_ENTROPY_FUNC_STRONG) {
+        func_strength = MBEDTLS_ENTROPY_SOURCE_STRONG;
+        threshold = BYTES_REQUIRED_TO_SEED;
+    }
     if(0 != mbedtls_entropy_add_source(&ctx->entropy_ctx,
             entropy_cb, &ctx->platform_entropy,
-            BYTES_REQUIRED_TO_SEED, func_strength)) {
+            threshold, func_strength)) {
         return false;
     }
 

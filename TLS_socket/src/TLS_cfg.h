@@ -18,7 +18,10 @@
 
 // no default entropy sources will work on the target platform:
 // we have to roll our own seedfile-based entropy
-#define MBEDTLS_NO_DEFAULT_ENTROPY_SOURCES
+
+// Don't disable all default sources: we do want to use MBEDTLS_ENTROPY_NV_SEED
+//#define MBEDTLS_NO_DEFAULT_ENTROPY_SOURCES
+
 #define MBEDTLS_NO_PLATFORM_ENTROPY
 #define MBEDTLS_ENTROPY_NV_SEED
 #define MBEDTLS_PLATFORM_NV_SEED_ALT
