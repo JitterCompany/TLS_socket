@@ -1,13 +1,16 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#include "TCP.h"
+#include <TLS_socket/TCP.h>
 #include "TCP_unix.h"
 
 // DEBUG
-#include <stdio.h>
-#define DEBUG_MINI_CHUNK_SIZE (256)
-#define DEBUG_MINI_BUFFER_SIZE (2*DEBUG_MINI_CHUNK_SIZE)
+#ifndef DEBUG_MINI_CHUNK_SIZE
+    #define DEBUG_MINI_CHUNK_SIZE (256)
+#endif
+#ifndef DEBUG_MAX_CONTINUOUS_COUNT
+    #define DEBUG_MAX_CONTINUOUS_COUNT (3)
+#endif
 
 void tcp_unix_init(TCP *ctx)
 {
@@ -52,8 +55,6 @@ static int debug_read_count;
 
 int tcp_write(TCP *ctx, const uint8_t *buffer, size_t sizeof_buffer)
 {
-    printf("tcp_write(): %u bytes\n", (unsigned int)sizeof_buffer);
-
     if(!ctx->connected) { 
         return TCP_RESULT_ERROR;
     }
@@ -62,8 +63,8 @@ int tcp_write(TCP *ctx, const uint8_t *buffer, size_t sizeof_buffer)
     if(sizeof_buffer > DEBUG_MINI_CHUNK_SIZE) {
         sizeof_buffer = DEBUG_MINI_CHUNK_SIZE;
     }
-    debug_write_count+=sizeof_buffer;
-    if(debug_write_count > DEBUG_MINI_BUFFER_SIZE) {
+    debug_write_count++;
+    if(debug_write_count >= DEBUG_MAX_CONTINUOUS_COUNT) {
         debug_write_count = 0;
         return TCP_RESULT_WANT_WRITE;
     }
@@ -84,8 +85,6 @@ int tcp_write(TCP *ctx, const uint8_t *buffer, size_t sizeof_buffer)
 
 int tcp_read(TCP *ctx, uint8_t *buffer, size_t sizeof_buffer)
 {
-    printf("tcp_read(): %u bytes\n", (unsigned int)sizeof_buffer);
-
     if(!ctx->connected) { 
         return TCP_RESULT_ERROR;
     }
@@ -94,8 +93,8 @@ int tcp_read(TCP *ctx, uint8_t *buffer, size_t sizeof_buffer)
     if(sizeof_buffer > DEBUG_MINI_CHUNK_SIZE) {
         sizeof_buffer = DEBUG_MINI_CHUNK_SIZE;
     }
-    debug_read_count+=sizeof_buffer;
-    if(debug_read_count > DEBUG_MINI_BUFFER_SIZE) {
+    debug_read_count++;
+    if(debug_read_count >= DEBUG_MAX_CONTINUOUS_COUNT) {
         debug_read_count = 0;
         return TCP_RESULT_WANT_READ;
     }
