@@ -80,6 +80,9 @@ file(GLOB TEST_MAIN_SOURCES
 include_directories("${TEST_TESTS_SOURCE_DIR}/mocks")
 include_directories("${TEST_NORMAL_SOURCE_DIR}/..")
 
+# allow includes as <TLS_socket/example.h>
+include_directories("${TEST_NORMAL_SOURCE_DIR}/../..")
+
 # mbed_tls: use our own src/tls_cfg.h instead of the default
 set(TLS_CFG_INCLUDE "<${TEST_NORMAL_SOURCE_DIR}/TLS_cfg.h>")
 add_definitions("-DMBEDTLS_CONFIG_FILE=${TLS_CFG_INCLUDE}")

@@ -54,13 +54,14 @@ void platform_entropy_unix_deinit(PlatformEntropy *ctx)
     ctx->initialized = false;
 }
 
-// No seed file implemented: should not be called
+// No seed file implemented: should not be used, but mbedTLS calls it
+// anyways (as a weak source)
 int platform_entropy_read_nv_seed(uint8_t *buffer, size_t sizeof_buffer)
 {
     ((void)buffer);
     ((void)sizeof_buffer);
 
-    return -1;
+    return 0; // we don't have any entropy
 }
 int platform_entropy_write_nv_seed(uint8_t *buffer, size_t sizeof_buffer)
 {
