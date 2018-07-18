@@ -71,7 +71,9 @@ static void set_error(TLSSocket *ctx, int error_code)
 {
     ctx->last_error = error_code;
 
-    finish_close(ctx);
+    if(ctx->state != TLS_SOCKET_STATE_NONE) {
+        finish_close(ctx);
+    }
 }
 
 static int entropy_cb(void *void_ctx,
