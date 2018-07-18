@@ -1,4 +1,4 @@
-#include "platform_entropy.h"
+#include <TLS_socket/platform_entropy.h>
 #include "platform_entropy_unix.h"
 
 #include <stdbool.h>
@@ -24,11 +24,8 @@ bool platform_entropy_get(PlatformEntropy *ctx,
     }
     *result_len = fread(result, 1, sizeof_result, fp);
 
-    printf("random: 0X");
     for(size_t i=0;i<sizeof_result;i++) {
-        printf("%02X", result[i]);
     }
-    printf("\n");
     fclose(fp);
 
     return true;
