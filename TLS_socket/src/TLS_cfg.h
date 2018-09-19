@@ -16,6 +16,9 @@
 #define MBEDTLS_MEMORY_BUFFER_ALLOC_C
 #define MBEDTLS_PLATFORM_EXIT_ALT
 
+// make snprintf function available to mbedtls
+#define MBEDTLS_PLATFORM_SNPRINTF_MACRO snprintf
+
 // no default entropy sources will work on the target platform:
 // we have to roll our own seedfile-based entropy
 
