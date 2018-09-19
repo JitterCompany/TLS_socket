@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include <string.h>
 
+
 // fragment_length to negotiate with the server.
 // Note: make sure the server supports this, and that
 // MBEDTLS_SSL_MAX_CONTENT_LEN is long enough (see TLS_cfg.h)
@@ -52,7 +53,7 @@ static inline int recv_cb(void *ctx,
 
 static bool finish_close(TLSSocket *ctx)
 {
-    ctx->state = TLS_SOCKET_STATE_CLOSING;
+    ctx->state = TLS_SOCKET_STATE_FINISH_CLOSING;
 
     // reset session: this allows a new connection with
     // TLS_socket_connect()
@@ -215,8 +216,11 @@ bool TLS_socket_configure(TLSSocket *ctx,
 
 bool TLS_socket_connect(TLSSocket *ctx, const char *host, const char *port)
 {
-    if(ctx->state == TLS_SOCKET_STATE_CLOSING) {
-        finish_close(ctx);
+    if((ctx->state == TLS_SOCKET_STATE_CLOSING)
+            || (ctx->state == TLS_SOCKET_STATE_FINISH_CLOSING)) {
+        if(!finish_close(ctx)) {
+            return false;
+        }
     }
 
     if(ctx->state != TLS_SOCKET_STATE_CLOSED) {
@@ -264,8 +268,11 @@ static bool handle_handshake(TLSSocket *ctx)
 
 bool TLS_socket_is_ready(TLSSocket *ctx)
 {
-    if(ctx->state == TLS_SOCKET_STATE_CLOSING) {
-        finish_close(ctx);
+    if((ctx->state == TLS_SOCKET_STATE_CLOSING)
+            || (ctx->state == TLS_SOCKET_STATE_FINISH_CLOSING)) {
+        if(!finish_close(ctx)) {
+            return false;
+        }
     }
 
     if(ctx->last_error) {
@@ -377,18 +384,22 @@ bool TLS_socket_try_close(TLSSocket *ctx)
         return true;
     }
 
-    ctx->state = TLS_SOCKET_STATE_CLOSING;
+    // try to send a close notify before finishing the connection
+    if(ctx->state != TLS_SOCKET_STATE_FINISH_CLOSING) {
 
-    int result = mbedtls_ssl_close_notify(&ctx->ssl);
-    if((result == MBEDTLS_ERR_SSL_WANT_WRITE)
-            || (result == MBEDTLS_ERR_SSL_WANT_READ))
-    {
-        return false;
-    }
-    // if an error occurs, there is not much we can do.
-    // Assume socket closed.
-    if(result < 0) {
-        set_error(ctx, result);
+        ctx->state = TLS_SOCKET_STATE_CLOSING;
+
+        int result = mbedtls_ssl_close_notify(&ctx->ssl);
+        if((result == MBEDTLS_ERR_SSL_WANT_WRITE)
+                || (result == MBEDTLS_ERR_SSL_WANT_READ))
+        {
+            return false;
+        }
+        // if an error occurs, there is not much we can do.
+        // Assume socket closed.
+        if(result < 0) {
+            set_error(ctx, result);
+        }
     }
 
     return finish_close(ctx);
