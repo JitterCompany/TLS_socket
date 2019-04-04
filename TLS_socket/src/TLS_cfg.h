@@ -8,6 +8,7 @@
 
 // mbedtls: avoid implicit declaration errors for memcpy / memset
 #include <string.h>
+#include <stdio.h>
 
 // override platform-specific dependencies such as libc/alloc
 #define MBEDTLS_PLATFORM_NO_STD_FUNCTIONS

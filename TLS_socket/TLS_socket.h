@@ -30,6 +30,16 @@ enum TLSSocketState {
 
 #define BYTES_REQUIRED_TO_SEED (1024)
 
+// This is project-specific.
+// If the server has a simple CA cert and the client is a 32-bit embedded
+// target, 14550 bytes might be enough. For a cert with SubjectAltName entries,
+// a few 100 bytes more might be required.
+//
+// On a 64-bit host (tested on ubuntu), slightly over 15k seems to be the minimum.
+#ifndef TLS_SOCKET_HEAP_SIZE
+#define TLS_SOCKET_HEAP_SIZE  16384
+#endif
+
 typedef struct {
     TCP *tcp;
     PlatformEntropy *platform_entropy;
@@ -43,7 +53,10 @@ typedef struct {
     mbedtls_ssl_config cfg;
     mbedtls_entropy_context entropy_ctx;
 
-    uint8_t mbedtls_buffer[14550];        // 'heap' memory for mbedtls
+    // The mbedtls library uses this buffer as its 'heap' memory.
+    // If you see unexpected behaviour (e.g. certificate fails to verify),
+    // try a larger buffer size...
+    uint8_t mbedtls_buffer[TLS_SOCKET_HEAP_SIZE];
 
 } TLSSocket;
 
