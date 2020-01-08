@@ -41,7 +41,7 @@ add_definitions("-DMBEDTLS_CONFIG_FILE=${TLS_CFG_INCLUDE}")
 
 CPM_AddModule("cpm_mbedtls"
     GIT_REPOSITORY "https://github.com/JitterCompany/cpm_mbedtls.git"
-    GIT_TAG "1.3"
+    GIT_TAG "1.4"
     EXPORT_MODULE TRUE)
 
 CPM_InitModule(${CPM_MODULE_NAME})
